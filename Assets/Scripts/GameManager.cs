@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
             _instance = this;
             return;
         }
-        
+
         Destroy(this);
     }
 
@@ -61,42 +61,48 @@ public class GameManager : MonoBehaviour
     {
         // Player with id connected to our session
         Debug.Log("Connected player with id: " + id);
-        
+
     }
 
     #endregion
 
     #region Login
 
-    void SetupEvents() {
-        AuthenticationService.Instance.SignedIn += () => {
+    void SetupEvents()
+    {
+        AuthenticationService.Instance.SignedIn += () =>
+        {
             // Shows how to get a playerID
             Debug.Log($"PlayerID: {AuthenticationService.Instance.PlayerId}");
             // Shows how to get an access token
             Debug.Log($"Access Token: {AuthenticationService.Instance.AccessToken}");
         };
 
-        AuthenticationService.Instance.SignInFailed += (err) => {
+        AuthenticationService.Instance.SignInFailed += (err) =>
+        {
             Debug.LogError(err);
         };
 
-        AuthenticationService.Instance.SignedOut += () => {
+        AuthenticationService.Instance.SignedOut += () =>
+        {
             Debug.Log("Player signed out.");
         };
-        
-        AuthenticationService.Instance.Expired += () => {
-                Debug.Log("Player session could not be refreshed and expired.");
+
+        AuthenticationService.Instance.Expired += () =>
+        {
+            Debug.Log("Player session could not be refreshed and expired.");
         };
     }
 
-    async Task SignInAnonymouslyAsync() {
+    async Task SignInAnonymouslyAsync()
+    {
         try
         {
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
             Debug.Log("Sign in anonymously succeeded!");
-            
+
             // Shows how to get the playerID
-            Debug.Log($"PlayerID: {AuthenticationService.Instance.PlayerId}"); 
+            Debug.Log($"PlayerID: {AuthenticationService.Instance.PlayerId}");
 
         }
         catch (AuthenticationException ex)
@@ -117,7 +123,8 @@ public class GameManager : MonoBehaviour
 
     #region Lobby
 
-    public async void FindMatch() {
+    public async void FindMatch()
+    {
         Debug.Log("Looking for a Lobby...");
         try
         {
@@ -140,17 +147,17 @@ public class GameManager : MonoBehaviour
 
             // Retrieve the Relay code previously set in the create match
             string joinCode = lobby.Data["joinCode"].Value;
-                
+
             Debug.Log("Received code: " + joinCode);
-            
+
             //Ask Unity Services to join a Relay allocation based on our join code
             JoinAllocation allocation = await Relay.Instance.JoinAllocationAsync(joinCode);
-                
+
             // Create Object
             _joinData = new RelayJoinData
             {
                 Key = allocation.Key,
-                Port = (ushort) allocation.RelayServer.Port,
+                Port = (ushort)allocation.RelayServer.Port,
                 AllocationID = allocation.AllocationId,
                 AllocationIDBytes = allocation.AllocationIdBytes,
                 ConnectionData = allocation.ConnectionData,
@@ -160,13 +167,15 @@ public class GameManager : MonoBehaviour
 
             // Set transport data
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
-                _joinData.IPv4Address, 
-                _joinData.Port, 
-                _joinData.AllocationIDBytes, 
-                _joinData.Key, 
-                _joinData.ConnectionData, 
+                _joinData.IPv4Address,
+                _joinData.Port,
+                _joinData.AllocationIDBytes,
+                _joinData.Key,
+                _joinData.ConnectionData,
                 _joinData.HostConnectionData);
-                
+
+            //NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes("room password");
+
             // Finally start the client
             NetworkManager.Singleton.StartClient();
         }
@@ -177,7 +186,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public async void FindAllMatches() {
+    public async void FindAllMatches()
+    {
         try
         {
             QueryLobbiesOptions options = new QueryLobbiesOptions();
@@ -203,12 +213,15 @@ public class GameManager : MonoBehaviour
 
             QueryResponse lobbies = await Lobbies.Instance.QueryLobbiesAsync(options);
             Debug.Log("Lobbies available:");
-            if(lobbies.Results.Count > 0){
+            if (lobbies.Results.Count > 0)
+            {
                 for (int i = 0; i < lobbies.Results.Count; i++)
                 {
                     Debug.Log(lobbies.Results[i].Id + " - " + lobbies.Results[i].Name);
                 }
-            }else{
+            }
+            else
+            {
                 Debug.Log("Nothing");
             }
             //...
@@ -219,12 +232,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private async void CreateMath(bool IsPrivate = false) {
+    private async void CreateMath(bool IsPrivate = false)
+    {
         Debug.Log("Crating a new Lobby...");
         string lobbyName = "test lobby";
         int maxPlayers = 4;
         // External connections
-        int maxConnections = 3;
+        int maxConnections = maxPlayers - 1;
 
         //Ask Unity Services to allocate a Relay server that will handle up to 4 players: 3 peers and the host
         //The Allocation class represents all the necessary data for a Host player to start hosting using the specific Relay server allocated.
@@ -233,7 +247,7 @@ public class GameManager : MonoBehaviour
         _hostData = new RelayHostData
         {
             Key = allocation.Key,
-            Port = (ushort) allocation.RelayServer.Port,
+            Port = (ushort)allocation.RelayServer.Port,
             AllocationID = allocation.AllocationId,
             AllocationIDBytes = allocation.AllocationIdBytes,
             ConnectionData = allocation.ConnectionData,
@@ -269,17 +283,36 @@ public class GameManager : MonoBehaviour
         StartCoroutine(HeartbeatLobbyCoroutine(lobby.Id, 15));
 
         // Now that RELAY and LOBBY are set...
-            
+
         // Set Transports data
         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
-            _hostData.IPv4Address, 
-            _hostData.Port, 
-            _hostData.AllocationIDBytes, 
-            _hostData.Key, 
+            _hostData.IPv4Address,
+            _hostData.Port,
+            _hostData.AllocationIDBytes,
+            _hostData.Key,
             _hostData.ConnectionData);
-            
+
+        //NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
+
         // Finally start host
         NetworkManager.Singleton.StartHost();
+    }
+
+    private void ApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
+    {
+        //Your logic here
+        bool approve = true;
+        bool createPlayerObject = true;
+        Debug.Log("connectionData: " + connectionData);
+
+        // Position to spawn the player object at, set to null to use the default position
+        Vector3? positionToSpawnAt = Vector3.zero;
+
+        // Rotation to spawn the player object at, set to null to use the default rotation
+        Quaternion rotationToSpawnWith = Quaternion.identity;
+
+        //If approve is true, the connection gets added. If it's false. The client gets disconnected
+        callback(createPlayerObject, null, approve, positionToSpawnAt, rotationToSpawnWith);
     }
 
     IEnumerator HeartbeatLobbyCoroutine(string lobbyId, float waitTimeSeconds)
@@ -294,7 +327,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void OnDestroy(){
+    private void OnDestroy()
+    {
         LobbyService.Instance.DeleteLobbyAsync(_lobbyId);
     }
 
