@@ -298,7 +298,7 @@ public class GameManager : MonoBehaviour
         NetworkManager.Singleton.StartHost();
     }
 
-    private void ApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
+    /* private void ApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
     {
         //Your logic here
         bool approve = true;
@@ -313,7 +313,7 @@ public class GameManager : MonoBehaviour
 
         //If approve is true, the connection gets added. If it's false. The client gets disconnected
         callback(createPlayerObject, null, approve, positionToSpawnAt, rotationToSpawnWith);
-    }
+    } */
 
     IEnumerator HeartbeatLobbyCoroutine(string lobbyId, float waitTimeSeconds)
     {
