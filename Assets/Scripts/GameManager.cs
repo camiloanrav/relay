@@ -17,6 +17,9 @@ using Unity.Networking.Transport;
 using Unity.Networking.Transport.Relay;
 using NetworkEvent = Unity.Networking.Transport.NetworkEvent;
 using Unity.Netcode.Transports.UTP;
+#if UNITY_EDITOR
+using ParrelSync;
+#endif
 
 public class GameManager : MonoBehaviour
 {
@@ -44,8 +47,15 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     async void Start()
     {
+        var options = new InitializationOptions();
+        #if UNITY_EDITOR
+            // Remove this if you don't have ParrelSync installed. 
+            // It's used to differentiate the clients, otherwise lobby will count them as the same
+            if (ClonesManager.IsClone()) options.SetProfile(ClonesManager.GetArgument());
+            else options.SetProfile("Primary");
+        #endif
         // UnityServices.InitializeAsync() will initialize all services that are subscribed to Core.
-        await UnityServices.InitializeAsync();
+        await UnityServices.InitializeAsync(options);
         Debug.Log(UnityServices.State);
         SetupEvents();
         // Login

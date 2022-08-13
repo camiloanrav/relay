@@ -35,6 +35,19 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    void Fire(){
+        var newBullet = Instantiate(projectile, projectileSpawn.position, projectileSpawn.rotation);
+        newBullet.velocity = projectileSpawn.forward * speed;
+        newBullet.GetComponent<NetworkObject>().Spawn();
+        Debug.Log("Server Spawn");
+    }
+
+    [ServerRpc]
+    void FireServerRpc()
+    {
+        Fire();
+    }
+
     void Update()
     {
         //transform.position = NetPosition.Value;
@@ -42,11 +55,11 @@ public class PlayerController : NetworkBehaviour
         {
             if(Input.GetKeyDown(KeyCode.Mouse0))
             {      
-                var newBullet = Instantiate(projectile, projectileSpawn.position, projectileSpawn.rotation);
-                // Might have to tweak the direction using -transform.forward according to your needs
-                newBullet.velocity = projectileSpawn.forward * speed;
-                newBullet.GetComponent<NetworkObject>().Spawn();
-
+                if(IsServer){
+                    Fire();
+                } else{
+                    FireServerRpc();
+                }
                 Debug.Log("Shoot!");
             }
             /* if (NetworkManager.Singleton.IsServer)
