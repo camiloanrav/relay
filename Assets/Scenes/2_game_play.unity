@@ -1055,11 +1055,6 @@ MonoBehaviour:
       SourcePrefabToOverride: {fileID: 248369394391680152, guid: 768d36db751cf9a41b94e7ff9ded20ed, type: 3}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 3466162734950565832, guid: cbd068c5f42c1194f8d935c828d6107b, type: 3}
-    - Override: 0
-      Prefab: {fileID: 5415808816690229441, guid: ee027f6a09ae83f4099c4c2d0822c35d, type: 3}
-      SourcePrefabToOverride: {fileID: 248369394391680152, guid: 768d36db751cf9a41b94e7ff9ded20ed, type: 3}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 3466162734950565832, guid: cbd068c5f42c1194f8d935c828d6107b, type: 3}
     TickRate: 30
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
