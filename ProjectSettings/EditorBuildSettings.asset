@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/relay.unity
     guid: c2a77cbfa6cb67a4fafb31c54c89c5d0
+  - enabled: 1
+    path: Assets/Scenes/2_game_play.unity
+    guid: 9f5d029d58146424787a05e3a2514897
   m_configObjects: {}
