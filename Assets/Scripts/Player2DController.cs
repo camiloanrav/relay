@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class Player2DController : NetworkBehaviour
 {
+    public Rigidbody2D _projectile;
+    public Transform _spawner;
     private Text LifeLabel;
     public NetworkVariable<int> _netLife = new NetworkVariable<int>(
         default,
@@ -58,6 +60,7 @@ public class Player2DController : NetworkBehaviour
             if(Input.GetKey(KeyCode.Space) && grounded)
                 Jump();
 
+
             // Set animator parameters
             anim.SetBool("run", horizontalInput != 0);
             anim.SetBool("grounded", grounded);
@@ -70,17 +73,19 @@ public class Player2DController : NetworkBehaviour
         grounded = false;
     }
 
+    private void OnTriggerEnter2D(Collider2D collision){
+        Debug.Log("Fire");
+        if(collision.gameObject.tag == "Fire"){
+            if(IsOwner){
+                Debug.Log("Fire IsOwner");
+                _netLife.Value -= 10;
+            } 
+        }
+    }
+
     private void OnCollisionEnter2D(Collision2D collision){
         if(collision.gameObject.tag == "Ground"){
             grounded = true;
-        }
-
-        if(collision.gameObject.tag == "Fire"){
-            
-            if(IsOwner){
-                _netLife.Value -= 10;
-            } 
-            
         }
     }
 
