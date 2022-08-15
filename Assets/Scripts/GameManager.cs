@@ -71,7 +71,6 @@ public class GameManager : MonoBehaviour
     {
         // Player with id connected to our session
         Debug.Log("Connected player with id: " + id);
-
     }
 
     #endregion

@@ -2,24 +2,50 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using UnityEngine.UI;
 
 public class Player2DController : NetworkBehaviour
 {
+    private Text LifeLabel;
+    public NetworkVariable<int> _netLife = new NetworkVariable<int>(
+        default,
+        NetworkVariableBase.DefaultReadPerm, // Everyone
+        NetworkVariableWritePermission.Owner);
     private Rigidbody2D body;
     private Animator anim;
     private Animator m_NetworkAnimator;
     private float speed = 10;
     private bool grounded;
+    private GameObject playerInfo;
+
+    public override void OnNetworkSpawn(){
+        _netLife.OnValueChanged += OnLifeChanged;
+
+        if (IsOwner){
+            _netLife.Value = 100;
+            GameObject.Find("Main Camera").GetComponent<CameraController>().player = transform;
+        }
+
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        _netLife.OnValueChanged -= OnLifeChanged;
+    }
 
     void Awake(){
         body = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        LifeLabel = GameObject.Find("LifeLabel").GetComponent<Text>();
+
+        playerInfo = new GameObject("Child");
+        playerInfo.transform.SetParent(GameObject.Find("Players").transform);
+        playerInfo.AddComponent<Text>().text = "";
+        playerInfo.GetComponent<Text>().font = Resources.GetBuiltinResource(typeof(Font), "Arial.ttf") as Font;
     }
 
-    void FixedUpdate()
-    {
-        if(IsOwner)
-        {
+    void FixedUpdate(){
+        if(IsOwner){
             float horizontalInput = Input.GetAxis("Horizontal");
             body.velocity = new Vector2(horizontalInput * speed, body.velocity.y);
 
@@ -48,5 +74,25 @@ public class Player2DController : NetworkBehaviour
         if(collision.gameObject.tag == "Ground"){
             grounded = true;
         }
+
+        if(collision.gameObject.tag == "Fire"){
+            
+            if(IsOwner){
+                _netLife.Value -= 10;
+            } 
+            
+        }
+    }
+
+    public void OnLifeChanged(int previous, int current)
+    {
+        if(current != 100){
+            Debug.Log("Player " + NetworkObjectId + " was damaged by " + (previous - current));
+        }
+        Text t = playerInfo.GetComponent<Text>();
+        t.text = "Player " + NetworkObjectId + ": " + current.ToString();
+        if(IsOwner){
+            LifeLabel.text = (_netLife.Value).ToString();
+        } 
     }
 }
