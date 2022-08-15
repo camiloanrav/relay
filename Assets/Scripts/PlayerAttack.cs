@@ -5,13 +5,15 @@ using Unity.Netcode;
 
 public class PlayerAttack : NetworkBehaviour
 {
-    private float attackCoolDown = 1f;
+    private float attackCoolDown = 0.25f;
     public Transform firePoint;
     private List<GameObject> fireBalls = new List<GameObject>();
     public GameObject fireBall;
     private Animator anim;
     private Player2DController player2DController;
     private float coolDownTimer = Mathf.Infinity;
+
+    private bool canAttack = true;
     // Start is called before the first frame update
     void Awake()
     {
@@ -29,7 +31,8 @@ public class PlayerAttack : NetworkBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if(IsOwner && Input.GetMouseButton(0) && coolDownTimer > attackCoolDown){
+        if(IsOwner && Input.GetMouseButton(0) && coolDownTimer > attackCoolDown && canAttack){
+            canAttack = !canAttack;
             RequestFireServerRpc();
         }
 
@@ -51,11 +54,10 @@ public class PlayerAttack : NetworkBehaviour
         anim.SetTrigger("attack");
 
         // Pool fireBalls
-        /* var projectile = Instantiate(fireBall, firePoint.position, Quaternion.identity);
-        projectile.GetComponent<Projectile>().SetDirection(Mathf.Sign(transform.localScale.x)); */
         int index = FindFireball();
         fireBalls[index].transform.position = firePoint.position;
         fireBalls[index].GetComponent<Projectile>().SetDirection(Mathf.Sign(transform.localScale.x));
+        canAttack = !canAttack;
     }
 
     private int FindFireball(){

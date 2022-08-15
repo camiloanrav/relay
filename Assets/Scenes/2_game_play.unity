@@ -856,6 +856,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72956c52f89150041bcadde4d9954ac3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  button1: {fileID: 426500905}
+  button2: {fileID: 858184470}
   LobbyeLabel: {fileID: 170771407}
 --- !u!4 &763792868
 Transform:

@@ -23,6 +23,8 @@ using ParrelSync;
 
 public class GameManager : MonoBehaviour
 {
+    public GameObject button1;
+    public GameObject button2;
     // Singleton
     public static GameManager _instance;
     public static GameManager Instance => _instance;
@@ -193,6 +195,9 @@ public class GameManager : MonoBehaviour
             Debug.Log("Cannot find a match: " + e);
             CreateMath();
         }
+
+        button1.gameObject.SetActive(false);
+        button2.gameObject.SetActive(false);
     }
 
     public async void FindAllMatches()
