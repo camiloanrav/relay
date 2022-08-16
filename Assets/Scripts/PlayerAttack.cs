@@ -31,9 +31,13 @@ public class PlayerAttack : NetworkBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if(IsOwner && Input.GetMouseButton(0) && coolDownTimer > attackCoolDown && canAttack){
+        if(!IsOwner)
+            return;
+
+        if(Input.GetMouseButton(0) && coolDownTimer > attackCoolDown && canAttack){
             canAttack = !canAttack;
             RequestFireServerRpc();
+            Attack();
         }
 
         coolDownTimer += Time.deltaTime;
@@ -46,7 +50,8 @@ public class PlayerAttack : NetworkBehaviour
 
     [ClientRpc]
     private void FireClientRpc() {
-        Attack();
+        if(!IsOwner)
+            Attack();
     }
 
     private void Attack(){

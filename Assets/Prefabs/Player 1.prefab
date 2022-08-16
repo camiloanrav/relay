@@ -18,9 +18,10 @@ GameObject:
   - component: {fileID: 8688284038690801510}
   - component: {fileID: 842892882846375153}
   - component: {fileID: 6367244863872410233}
+  - component: {fileID: 7842690735752624644}
   m_Layer: 0
   m_Name: Player 1
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -198,6 +199,9 @@ MonoBehaviour:
   _spawner: {fileID: 4725031499371254583}
   _netLife:
     m_InternalValue: 0
+  speed: 10
+  jumpSpeed: 10
+  velocityEffectCtr: 0
 --- !u!95 &8688284038690801510
 Animator:
   serializedVersion: 4
@@ -245,6 +249,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   firePoint: {fileID: 4725031499371254583}
   fireBall: {fileID: 4141479598187801187, guid: fba0d2a6118a32343bff005e1737b212, type: 3}
+--- !u!114 &7842690735752624644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4061991616695892475}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0e4f9019a1c2b64f844fd44d70f5eed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8731580045761150892
 GameObject:
   m_ObjectHideFlags: 0

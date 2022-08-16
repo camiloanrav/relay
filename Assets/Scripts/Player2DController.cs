@@ -16,7 +16,9 @@ public class Player2DController : NetworkBehaviour
     private Rigidbody2D body;
     private Animator anim;
     private Animator m_NetworkAnimator;
-    private float speed = 10;
+    public float speed = 10;
+    public float jumpSpeed = 10;
+    public int velocityEffectCtr = 0;
     private bool grounded;
     private GameObject playerInfo;
 
@@ -47,6 +49,9 @@ public class Player2DController : NetworkBehaviour
     }
 
     void FixedUpdate(){
+        if(!IsOwner)
+            return;
+
         if(IsOwner){
             float horizontalInput = Input.GetAxis("Horizontal");
             body.velocity = new Vector2(horizontalInput * speed, body.velocity.y);
@@ -68,13 +73,12 @@ public class Player2DController : NetworkBehaviour
     }
 
     private void Jump(){
-        body.velocity = new Vector2(body.velocity.x, speed);
+        body.velocity = new Vector2(body.velocity.x, jumpSpeed);
         anim.SetTrigger("jump");
         grounded = false;
     }
 
     private void OnTriggerEnter2D(Collider2D collision){
-        Debug.Log("Fire");
         if(collision.gameObject.tag == "Fire"){
             if(IsOwner){
                 Debug.Log("Fire IsOwner");
@@ -95,9 +99,9 @@ public class Player2DController : NetworkBehaviour
             Debug.Log("Player " + NetworkObjectId + " was damaged by " + (previous - current));
         }
         Text t = playerInfo.GetComponent<Text>();
-        t.text = "Player " + NetworkObjectId + ": " + current.ToString();
+        t.text = "Life Player " + NetworkObjectId + ": " + current.ToString();
         if(IsOwner){
-            LifeLabel.text = (_netLife.Value).ToString();
+            LifeLabel.text = "Your life :" + (_netLife.Value).ToString();
         } 
     }
 }
